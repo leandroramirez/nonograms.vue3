@@ -2,12 +2,13 @@
 
 Just a simple version of the game I found out in the 2020 quarantine.
 
-<--
-To deploy to a Github page:
-- Download master branch
-- Set your "base" value in vite.config.js file.
-- Run:
-    yarn install
-    yarn build
-    git subtree push --prefix dist origin gh-pages
--->
+https://leandroramirez.github.io/nonograms.vue3/
+
+
+[comment]: # (To deploy to a Github page:)
+[comment]: # (- Download master branch)
+[comment]: # (- Set your "base" value in vite.config.js file.)
+[comment]: # (- Run:)
+[comment]: # (    yarn install)
+[comment]: # (    yarn build)
+[comment]: # (    git subtree push --prefix dist origin gh-pages)
