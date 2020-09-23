@@ -11,5 +11,7 @@ module.exports = {
   // Workarond:
   base: process.env.npm_lifecycle_event === 'build'
     ? '/nonograms.vue3'
-    : '/'
+    : '/',
+  // Default value is '_assets'. The underscore make this folder hidden in gh_pages, so I redefine it.
+  assetsDir: 'assets'
 }
