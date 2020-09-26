@@ -18,12 +18,26 @@
 </template>
 
 <script>
-import { nonograms } from "/@/assets/nonograms.js";
+import { fetchNonograms } from "/@/api/nonograms.js";
 
 export default {
   data() {
-    return { nonograms };
-  }
+    return {
+      nonograms: null
+    }
+  },
+  created () {
+    this.loadNonograms()
+  },
+  methods: {
+    loadNonograms () {
+      fetchNonograms()
+      .then(nonograms => {
+        this.nonograms = nonograms
+      })
+      //TODO: handle catch (communication, auth, etc errors)
+    },
+  },
 };
 </script>
 

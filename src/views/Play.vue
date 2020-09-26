@@ -8,7 +8,7 @@
 
 <script>
 import Board from "/@/components/Board.vue";
-import { nonograms } from "/@/assets/nonograms.js";
+import { fetchNonogram } from "/@/api/nonograms.js";
 
 export default {
   components: {
@@ -17,11 +17,24 @@ export default {
   props: {
     id: String
   },
-  computed: {
-    nonogram() {
-      return nonograms.find(n => n.id === this.id);
+  data () {
+    return {
+      nonogram: null,
     }
-  }
+  },
+  created () {
+    this.loadNonogram(this.id)
+  },
+  methods: {
+    loadNonogram (id) {
+      fetchNonogram(id)
+      .then(nonogram => {
+        //TODO: handle null nonogram (not found)
+        this.nonogram = nonogram
+      })
+      //TODO: handle catch (communication, auth, etc errors)
+    },
+  },
 };
 </script>
 
