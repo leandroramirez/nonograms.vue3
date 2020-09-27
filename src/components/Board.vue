@@ -1,3 +1,175 @@
+<!-- TODO: Decouple responsabilities -->
+<script>
+import { ref, computed } from 'vue'
+import Grid from "/@/components/Grid.vue"
+import HorizontalClues from "/@/components/HorizontalClues.vue"
+import VerticalClues from "/@/components/VerticalClues.vue"
+import {
+  crossColorKey,
+  reservedColorKeys
+} from "/@/consts/reservedColorKeys.js"
+
+export default {
+  components: {
+    Grid,
+    HorizontalClues,
+    VerticalClues
+  },
+  props: {
+    nonogram: Object
+  },
+  setup (props) {
+    const selectedColor = ref(null)
+    const userPixels = ref(null)
+
+    const click = index => {
+      const pixel = userPixels.value[index]
+      const newValue =
+        pixel === backgroundColor.value
+          ? selectedColor.value
+          : pixel === selectedColor.value
+          ? crossColorKey
+          : backgroundColor.value
+
+      userPixels.value[index] = newValue
+    }
+    const setColor = ({ index, newColor }) => {
+      userPixels.value[index] = newColor
+    }
+    const getMaxLengthInnerArray = array => {
+      let maxLength = 0
+      for (let innerArray of array) {
+        if (innerArray.length > maxLength) {
+          maxLength = innerArray.length
+        }
+      }
+      return maxLength
+    }
+    const getContrastYIQ = hexcolor => {
+      // From https://24ways.org/2010/calculating-color-contrast/
+      var r = parseInt(hexcolor.substr(1, 2), 16)
+      var g = parseInt(hexcolor.substr(3, 2), 16)
+      var b = parseInt(hexcolor.substr(5, 2), 16)
+      var yiq = (r * 299 + g * 587 + b * 114) / 1000
+      return yiq >= 128 ? "black" : "white"
+    }
+    const getClues = (linesLength, pixelsLength, getPixelFn) => {
+      const clues = []
+      for (let lineIndex = 0; lineIndex < linesLength; lineIndex++) {
+        let cluesGroup = []
+        let currentClue = {}
+        for (let pixelIndex = 0; pixelIndex < pixelsLength; pixelIndex++) {
+          const pixel = getPixelFn(lineIndex, pixelIndex)
+
+          if (pixel === currentClue.color) {
+            currentClue.length++
+            continue
+          }
+
+          if (pixel === backgroundColor.value) {
+            currentClue = {}
+            continue
+          }
+
+          currentClue = {
+            color: pixel,
+            realColor: props.nonogram.colors[pixel],
+            textColor: textColors.value[pixel],
+            length: 1,
+            completed: false
+          }
+          cluesGroup.push(currentClue)
+        }
+
+        clues.push(cluesGroup)
+      }
+      return clues
+    }
+
+    const backgroundColor = computed(() => {
+      return Object.keys(props.nonogram.colors)[0]
+    })
+    const isSolved = computed(() => {
+      if (!userPixels.value) {
+        return false
+      }
+      const nonogramPixels = props.nonogram.pixels
+      const length = nonogramPixels.length;
+      for (let i = 0; i < length; i++) {
+        // All reserved color keys are interpreted os background color
+        const pixel = reservedColorKeys.includes(userPixels.value[i])
+          ? backgroundColor.value
+          : userPixels.value[i]
+        if (pixel !== nonogramPixels[i]) {
+          return false
+        }
+      }
+      return true
+    })
+    const horizontalClues = computed(() => {
+      const width = props.nonogram.width
+      const pixels = props.nonogram.pixels
+      return getClues(
+        props.nonogram.height,
+        width,
+        (lineIndex, pixelIndex) => pixels[lineIndex * width + pixelIndex]
+      )
+    })
+    const horizontalCluesMaxLength = computed(() => {
+      return getMaxLengthInnerArray(horizontalClues.value)
+    })
+    const verticalClues = computed(() => {
+      const width = props.nonogram.width
+      const pixels = props.nonogram.pixels
+      return getClues(
+        width,
+        props.nonogram.height,
+        (lineIndex, pixelIndex) => pixels[pixelIndex * width + lineIndex]
+      )
+    })
+    const verticalCluesMaxLength = computed(() => {
+      return getMaxLengthInnerArray(verticalClues.value)
+    })
+    const colors = computed(() => {
+      const colors = Object.assign({}, props.nonogram.colors)
+      console.log(colors)
+      reservedColorKeys.reduce((colors, r) => {
+        colors[r] = colors[backgroundColor.value]
+        console.log(r, colors[r])
+        return colors
+      }, colors)
+
+      return colors
+    })
+    const textColors = computed(() => {
+      return Object.keys(colors.value).reduce((textColors, colorKey) => {
+        textColors[colorKey] = getContrastYIQ(colors.value[colorKey])
+        return textColors
+      }, {})
+    })
+
+    selectedColor.value = Object.keys(props.nonogram.colors)[1]
+    userPixels.value = Array(props.nonogram.pixels.length).fill(
+      backgroundColor.value
+    )
+
+    return {
+      selectedColor,
+      userPixels,
+      click,
+      setColor,
+      isSolved,
+      horizontalClues,
+      horizontalCluesMaxLength,
+      verticalClues,
+      verticalCluesMaxLength,
+      colors,
+      textColors,
+    }
+  },
+}
+</script>
+
 <template>
   <div>
     <div
@@ -36,168 +208,6 @@
     <h4>{{ isSolved ? 'SOLVED!' : 'Unsolved...' }}</h4>
   </div>
 </template>
-
-<script>
-import Grid from "/@/components/Grid.vue";
-import HorizontalClues from "/@/components/HorizontalClues.vue";
-import VerticalClues from "/@/components/VerticalClues.vue";
-import {
-  crossColorKey,
-  reservedColorKeys
-} from "/@/consts/reservedColorKeys.js";
-
-export default {
-  components: {
-    Grid,
-    HorizontalClues,
-    VerticalClues
-  },
-  props: {
-    nonogram: Object
-  },
-  data() {
-    return {
-      selectedColor: null,
-      userPixels: null
-    };
-  },
-  created() {
-    this.selectedColor = Object.keys(this.nonogram.colors)[1];
-    this.userPixels = Array(this.nonogram.pixels.length).fill(
-      this.backgroundColor
-    );
-  },
-  methods: {
-    click(index) {
-      const pixel = this.userPixels[index];
-      const newValue =
-        pixel === this.backgroundColor
-          ? this.selectedColor
-          : pixel === this.selectedColor
-          ? crossColorKey
-          : this.backgroundColor;
-
-      this.userPixels[index] = newValue;
-    },
-    setColor({ index, newColor }) {
-      this.userPixels[index] = newColor;
-    },
-    getMaxLengthInnerArray(array) {
-      let maxLength = 0;
-      for (let innerArray of array) {
-        if (innerArray.length > maxLength) {
-          maxLength = innerArray.length;
-        }
-      }
-      return maxLength;
-    },
-    getContrastYIQ(hexcolor) {
-      // From https://24ways.org/2010/calculating-color-contrast/
-      var r = parseInt(hexcolor.substr(1, 2), 16);
-      var g = parseInt(hexcolor.substr(3, 2), 16);
-      var b = parseInt(hexcolor.substr(5, 2), 16);
-      var yiq = (r * 299 + g * 587 + b * 114) / 1000;
-      return yiq >= 128 ? "black" : "white";
-    },
-    getClues(linesLength, pixelsLength, getPixelFn) {
-      const clues = [];
-      for (let lineIndex = 0; lineIndex < linesLength; lineIndex++) {
-        let cluesGroup = [];
-        let currentClue = {};
-        for (let pixelIndex = 0; pixelIndex < pixelsLength; pixelIndex++) {
-          const pixel = getPixelFn(lineIndex, pixelIndex);
-
-          if (pixel === currentClue.color) {
-            currentClue.length++;
-            continue;
-          }
-
-          if (pixel === this.backgroundColor) {
-            currentClue = {};
-            continue;
-          }
-
-          currentClue = {
-            color: pixel,
-            realColor: this.nonogram.colors[pixel],
-            textColor: this.textColors[pixel],
-            length: 1,
-            completed: false
-          };
-          cluesGroup.push(currentClue);
-        }
-
-        clues.push(cluesGroup);
-      }
-      return clues;
-    }
-  },
-  computed: {
-    backgroundColor() {
-      return Object.keys(this.nonogram.colors)[0];
-    },
-    isSolved() {
-      if (!this.userPixels) {
-        return false;
-      }
-      const nonogramPixels = this.nonogram.pixels;
-      const length = nonogramPixels.length;
-      for (let i = 0; i < length; i++) {
-        // All reserved color keys are interpreted os background color
-        const pixel = reservedColorKeys.includes(this.userPixels[i])
-          ? this.backgroundColor
-          : this.userPixels[i];
-        if (pixel !== nonogramPixels[i]) {
-          return false;
-        }
-      }
-      return true;
-    },
-    horizontalClues() {
-      const width = this.nonogram.width;
-      const pixels = this.nonogram.pixels;
-      return this.getClues(
-        this.nonogram.height,
-        width,
-        (lineIndex, pixelIndex) => pixels[lineIndex * width + pixelIndex]
-      );
-    },
-    horizontalCluesMaxLength() {
-      return this.getMaxLengthInnerArray(this.horizontalClues);
-    },
-    verticalClues() {
-      const width = this.nonogram.width;
-      const pixels = this.nonogram.pixels;
-      return this.getClues(
-        width,
-        this.nonogram.height,
-        (lineIndex, pixelIndex) => pixels[pixelIndex * width + lineIndex]
-      );
-    },
-    verticalCluesMaxLength() {
-      return this.getMaxLengthInnerArray(this.verticalClues);
-    },
-    colors() {
-      const colors = Object.assign({}, this.nonogram.colors);
-      console.log(colors);
-      reservedColorKeys.reduce((colors, r) => {
-        colors[r] = colors[this.backgroundColor];
-        console.log(r, colors[r]);
-        return colors;
-      }, colors);
-
-      return colors;
-    },
-    textColors() {
-      const colors = this.colors;
-      return Object.keys(colors).reduce((textColors, colorKey) => {
-        textColors[colorKey] = this.getContrastYIQ(colors[colorKey]);
-        return textColors;
-      }, {});
-    }
-  }
-};
-</script>
 
 <style>
 /* I don't like the "scoped" option: I don't want data-v-XXXXXXXX attribute spread in all DOM elements. */

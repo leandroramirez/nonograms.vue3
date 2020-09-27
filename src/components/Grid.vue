@@ -1,3 +1,47 @@
+<script>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { crossColorKey } from "/@/consts/reservedColorKeys.js"
+
+export default {
+  props: {
+    pixels: Array,
+    width: Number,
+    colors: Object,
+    textColors: Object
+  },
+  setup(props, { emit }) {
+    const newColor = ref(null)
+
+    const onMouseDown = index => {
+      emit("click", index)
+      newColor.value = props.pixels[index]
+    }
+    const onMouseEnter = index => {
+      if (newColor.value !== null) {
+        emit("setColor", { index, newColor: newColor.value })
+      }
+    }
+    const onMouseUp = () => {
+      newColor.value = null
+    }
+
+    onMounted(() => {
+      document.addEventListener("mouseup", onMouseUp)
+    })
+    onUnmounted(() => {
+      document.removeEventListener("mouseup", onMouseUp)
+    })
+
+    return {
+      onMouseDown,
+      onMouseEnter,
+      onMouseUp,
+      crossColorKey,
+    }
+  },
+}
+</script>
+
 <template>
   <div class="nng-grid" :style="`grid-template-columns: repeat(${width}, 1fr);`">
     <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -14,49 +58,6 @@
     </svg>
   </div>
 </template>
-
-<script>
-import { crossColorKey } from "/@/consts/reservedColorKeys.js";
-
-export default {
-  props: {
-    pixels: Array,
-    width: Number,
-    colors: Object,
-    textColors: Object
-  },
-  data() {
-    return {
-      newColor: null
-    };
-  },
-  methods: {
-    onMouseDown(index) {
-      this.$emit("click", index);
-      this.newColor = this.pixels[index];
-    },
-    onMouseEnter(index) {
-      if (this.newColor !== null) {
-        this.$emit("setColor", { index, newColor: this.newColor });
-      }
-    },
-    onMouseUp() {
-      this.newColor = null;
-    }
-  },
-  computed: {
-    crossColorKey() {
-      return crossColorKey;
-    }
-  },
-  created() {
-    document.addEventListener("mouseup", this.onMouseUp);
-  },
-  unmounted() {
-    document.removeEventListener("mouseup", this.onMouseUp);
-  }
-};
-</script>
 
 <style>
 .nng-grid {

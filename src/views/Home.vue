@@ -1,3 +1,17 @@
+<script setup>
+import { fetchNonograms } from "/@/api/nonograms.js"
+import { ref } from 'vue'
+
+const nonograms = ref([])
+const loadNonograms = async () => {
+  //TODO: handle exceptios
+  nonograms.value = await fetchNonograms()
+}
+loadNonograms()
+
+export { nonograms, loadNonograms }
+</script>
+
 <template>
   <div class="nng-home">
     <h2>Menu</h2>
@@ -16,30 +30,6 @@
     </ul>
   </div>
 </template>
-
-<script>
-import { fetchNonograms } from "/@/api/nonograms.js";
-
-export default {
-  data() {
-    return {
-      nonograms: null
-    }
-  },
-  created () {
-    this.loadNonograms()
-  },
-  methods: {
-    loadNonograms () {
-      fetchNonograms()
-      .then(nonograms => {
-        this.nonograms = nonograms
-      })
-      //TODO: handle catch (communication, auth, etc errors)
-    },
-  },
-};
-</script>
 
 <style>
 .nng-home a.nng-nonogram,

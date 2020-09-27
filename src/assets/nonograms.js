@@ -68,6 +68,6 @@ const nonograms = [
         "000021121120000"
     )
   }
-];
+]
 
-export { nonograms };
+export { nonograms }

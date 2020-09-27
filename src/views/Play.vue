@@ -1,40 +1,82 @@
+<!--
+  3 ways to create composition API components. To me, the "no script setup" style is more legible.
+-->
+
+<!-- no script setup -->
+<script>
+import Board from "/@/components/Board.vue"
+import { fetchNonogram } from "/@/api/nonograms.js"
+import { ref } from 'vue'
+
+export default {
+  props: {
+    id: String,
+  },
+  components: {
+    Board,
+  },
+  setup (props) {
+    const nonogram = ref(null)
+    const loadNonogram = async (id) => {
+      //TODO: handle exceptios
+      nonogram.value = await fetchNonogram(id)
+    }
+    loadNonogram(props.id)
+
+    return { nonogram, loadNonogram }
+  },
+}
+</script>
+
+<!-- script setup as RFC says -->
+<!-- 
+<script setup="props">
+import { fetchNonogram } from "/@/api/nonograms.js"
+import { ref } from 'vue'
+
+export default {
+  props: {
+    id: String,
+  }
+}
+export { default as Board } from "/@/components/Board.vue"
+
+export const nonogram = ref(null)
+export const loadNonogram = async (id) => {
+  //TODO: handle exceptios
+  nonogram.value = await fetchNonogram(id)
+}
+loadNonogram(props.id)
+</script>
+-->
+
+<!-- script setup variant to reduce "export" declarations -->
+<!-- 
+<script setup="props">
+import Board from "/@/components/Board.vue"
+import { fetchNonogram } from "/@/api/nonograms.js"
+import { ref } from 'vue'
+
+const nonogram = ref(null)
+const loadNonogram = async (id) => {
+  //TODO: handle exceptios
+  nonogram.value = await fetchNonogram(id)
+}
+loadNonogram(props.id)
+
+export { Board, nonogram, loadNonogram }
+export default {
+  props: {
+    id: String,
+  }
+}
+</script>
+-->
+
 <template>
-  <div>
+  <div v-if="nonogram">
     <h2>Playing "{{ nonogram.name }}" nonogram</h2>
     <Board :nonogram="nonogram"/>
     <router-link :to="{ name: 'home' }">Back to home</router-link>
   </div>
 </template>
-
-<script>
-import Board from "/@/components/Board.vue";
-import { fetchNonogram } from "/@/api/nonograms.js";
-
-export default {
-  components: {
-    Board
-  },
-  props: {
-    id: String
-  },
-  data () {
-    return {
-      nonogram: null,
-    }
-  },
-  created () {
-    this.loadNonogram(this.id)
-  },
-  methods: {
-    loadNonogram (id) {
-      fetchNonogram(id)
-      .then(nonogram => {
-        //TODO: handle null nonogram (not found)
-        this.nonogram = nonogram
-      })
-      //TODO: handle catch (communication, auth, etc errors)
-    },
-  },
-};
-</script>
-

@@ -1,3 +1,12 @@
+<script>
+export default {
+  props: {
+    clue: Object,
+    colors: Object
+  }
+}
+</script>
+
 <template>
   <svg
     viewBox="0 0 100 100"
@@ -8,12 +17,3 @@
     <foreignObject width="100%" height="100%">{{ clue.length }}</foreignObject>
   </svg>
 </template>
-
-<script>
-export default {
-  props: {
-    clue: Object,
-    colors: Object
-  }
-};
-</script>
