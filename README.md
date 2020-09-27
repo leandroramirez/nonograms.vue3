@@ -1,4 +1,4 @@
-# Nonograms game PoC built in Vue.js 3.0 + Vite 1.0.
+# Nonograms game PoC developed using Vue.js 3.0 + Vite 1.0.
 
 Just a simple version of the game I found out in the 2020 quarantine.
 
