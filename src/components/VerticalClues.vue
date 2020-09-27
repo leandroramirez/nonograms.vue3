@@ -12,7 +12,7 @@ export default {
   }
 }
 </script>
-  
+
 <template>
   <div class="nng-vertical-clues" :style="`grid-template-rows: repeat(${maxLength}, 1fr);`">
     <template v-for="clueGroup in clues">
