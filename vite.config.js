@@ -3,7 +3,7 @@ module.exports = {
   alias: {
     '/@/': path.resolve(__dirname, './src')
   },
-  // FIXME: It doesn't work in Vite (NODE_ENV is undefined)
+  // FIXME: process.env.NODE_ENV is undefined in vite.config.js
   // base: process.env.NODE_ENV === 'production'
   //   ? '/nonograms.vue3'
   //   : '/'

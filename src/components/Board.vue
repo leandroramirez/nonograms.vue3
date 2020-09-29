@@ -37,6 +37,9 @@ export default {
     } = useClues(props.nonogram, textColors, backgroundColor)
 
     const click = index => {
+      if (isSolved.value) {
+        return
+      }
       const pixel = userPixels.value[index]
       const newValue =
         pixel === backgroundColor.value
@@ -48,6 +51,9 @@ export default {
       userPixels.value[index] = newValue
     }
     const setColor = ({ index, newColor }) => {
+      if (isSolved.value) {
+        return
+      }
       userPixels.value[index] = newColor
     }
 
@@ -93,7 +99,7 @@ export default {
 
 <template>
   <div>
-    <div class="nng-board">
+    <div class="nng-board grid select-none mx-auto">
       <div></div>
       <VerticalClues
         :clues="verticalClues"
@@ -114,16 +120,17 @@ export default {
         @setColor="setColor"
       />
     </div>
-    <h4>
+    <div class="mt-4">
       Colors:
       <template v-for="(color, colorKey, index) in nonogram.colors">
-        <label v-if="index" :key="colorKey">
-          <input type="radio" v-model="selectedColor" :value="colorKey" />
+        <label v-if="index" :key="colorKey" class="mx-2 cursor-pointer">
+          <input type="radio" v-model="selectedColor" :value="colorKey" class="mr-1" />
           <span class="nng-square nng-color-option" style="display:inline-block; width: 1em; height: 1em;" :style="`background: ${color};`"></span>
         </label>
       </template>
-    </h4>
-    <h4>{{ isSolved ? 'SOLVED!' : 'Unsolved...' }}</h4>
+    </div>
+    <div v-if="isSolved" class="font-semibold text-center animate-bounce text-5xl md:text-6xl">🏆 SOLVED! 🏆</div>
+    <div v-else>Unsolved...</div>
   </div>
 </template>
 
@@ -133,9 +140,6 @@ export default {
 }">
 /* I don't like the "scoped" option: I don't want data-v-XXXXXXXX attribute spread in all DOM elements. */
 .nng-board {
-  display: grid;
-  user-select: none;
-  margin: 0 auto;
   grid-template-columns: var(--nngBoardGridTemplateColumns);
   max-width: var(--nngBoardMaxWidth);
 }
