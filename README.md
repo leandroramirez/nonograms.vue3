@@ -5,7 +5,7 @@ Just a simple version of the game I found out in the 2020 quarantine.
 
 To play: https://leandroramirez.github.io/nonograms.vue3/
 
-It's a migration of this repo: https://github.com/leandroramirez/nonograms.vue2 (Vue.js 2.6 + @vue/cli + npm)
+It's a migration of this repo: https://github.com/leandroramirez/nonograms.vue2 (Vue.js 2.6 + Vue CLI + npm)
 
 
 [comment]: # (To deploy to a Github page:)
