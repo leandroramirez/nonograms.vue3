@@ -3,3 +3,5 @@ node_modules
 # "dist" is commented to upload to "gh-pages" branch
 #dist
 *.local
+/yarn.lock
+/yarn-error.log

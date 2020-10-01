@@ -49,8 +49,6 @@ export default {
       v-for="(value, index) of pixels"
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
       class="nng-square"
       :style="`background: ${colors[value]}; color: ${textColors[value]};`"
       @mousedown="onMouseDown(index)"

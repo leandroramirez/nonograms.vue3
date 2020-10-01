@@ -147,7 +147,7 @@ export default {
 .nng-square {
   box-shadow: inset -1px 2px 8px -5px;
   font-size: 5em;
-  line-height: 1.3em;
+  line-height: 1.2;
   text-align: center;
   background: #fff;
 }
