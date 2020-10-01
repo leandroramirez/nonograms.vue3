@@ -11,39 +11,41 @@ export default {
   },
   setup(props, { emit }) {
     const newColor = ref(null)
+    const root = ref(null)
 
-    const onMouseDown = index => {
+    const onPointerDown = (index, event) => {
+      event.target.releasePointerCapture(event.pointerId)
       emit("click", index)
       newColor.value = props.pixels[index]
     }
-    const onMouseEnter = index => {
+    const onPointerEnter = index => {
       if (newColor.value !== null) {
         emit("setColor", { index, newColor: newColor.value })
       }
     }
-    const onMouseUp = () => {
+    const onPointerUp = () => {
       newColor.value = null
     }
 
     onMounted(() => {
-      document.addEventListener("mouseup", onMouseUp)
+      document.addEventListener("pointerup", onPointerUp)
     })
     onUnmounted(() => {
-      document.removeEventListener("mouseup", onMouseUp)
+      document.removeEventListener("pointerup", onPointerUp)
     })
 
     return {
-      onMouseDown,
-      onMouseEnter,
-      onMouseUp,
+      onPointerDown,
+      onPointerEnter,
       crossColorKey,
+      root,
     }
   },
 }
 </script>
 
 <template>
-  <div class="nng-grid" :style="`grid-template-columns: repeat(${width}, 1fr);`">
+  <div ref="root" class="nng-grid" :style="`grid-template-columns: repeat(${width}, 1fr);`">
     <!-- eslint-disable-next-line vue/require-v-for-key -->
     <svg
       v-for="(value, index) of pixels"
@@ -51,8 +53,8 @@ export default {
       xmlns="http://www.w3.org/2000/svg"
       class="nng-square"
       :style="`background: ${colors[value]}; color: ${textColors[value]};`"
-      @mousedown="onMouseDown(index)"
-      @mouseenter="onMouseEnter(index)"
+      @pointerdown ="onPointerDown(index, $event)"
+      @pointerenter ="onPointerEnter(index)"
     >
       <foreignObject x="0" y="0" width="100%" height="100%">{{ value === crossColorKey ? 'X': '' }}</foreignObject>
     </svg>
@@ -65,6 +67,7 @@ export default {
   grid-gap: 1px;
   background: #333;
   border: 1px solid #333;
+  touch-action: none;
 }
 .nng-grid .nng-square {
   cursor: pointer;

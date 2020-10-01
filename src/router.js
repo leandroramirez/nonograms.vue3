@@ -15,7 +15,17 @@ const router = createRouter ({
       path: "/",
       name: "home",
       component: Home,
-      meta: { title: "Home" }
+      meta: { title: "Home" },
+      beforeEnter: (to, from, next) => { // Hack history mode on gh_pages (router.js + 404.html)
+        const baseUrl = router.options.history.base
+        const redirectUrl = to.query.q
+        if (redirectUrl && redirectUrl.startsWith(baseUrl)) {
+          next(redirectUrl.substring(baseUrl.length))
+        }
+        else {
+          next()
+        }
+      }
     },
     {
       path: "/play/:id",
@@ -23,10 +33,10 @@ const router = createRouter ({
       component: Play,
       props: true,
       meta: { title: "You can do it!" }
-    }
+    },
   ]
 })
-
+window.r = router
 router.afterEach(async to => {
   await nextTick()
   document.title = (!to.meta || !to.meta.title ? "" : to.meta.title + " - ") + siteTitle
