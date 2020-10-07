@@ -1,7 +1,6 @@
 node_modules
 .DS_Store
-# "dist" is commented to upload to "gh-pages" branch
-#dist
+/dist
 *.local
 /yarn.lock
 /yarn-error.log
