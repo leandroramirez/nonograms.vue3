@@ -25,7 +25,6 @@ export default {
 
     const {
       colors,
-      textColors,
       backgroundColor,
     } = useColors(props.nonogram)
 
@@ -34,7 +33,7 @@ export default {
       horizontalCluesMaxLength,
       verticalClues,
       verticalCluesMaxLength,
-    } = useClues(props.nonogram, textColors, backgroundColor)
+    } = useClues(props.nonogram, backgroundColor)
 
     const click = index => {
       if (isSolved.value) {
@@ -91,7 +90,6 @@ export default {
       verticalClues,
       verticalCluesMaxLength,
       colors,
-      textColors,
     }
   },
 }
@@ -115,7 +113,6 @@ export default {
         :pixels="userPixels"
         :width="nonogram.width"
         :colors="colors"
-        :textColors="textColors"
         @click="click"
         @setColor="setColor"
       />

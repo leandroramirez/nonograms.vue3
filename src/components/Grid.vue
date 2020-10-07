@@ -1,13 +1,16 @@
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { crossColorKey } from "/@/consts/reservedColorKeys.js"
+import Square from "/@/components/Square.vue"
 
 export default {
+  components: {
+    Square
+  },
   props: {
     pixels: Array,
     width: Number,
     colors: Object,
-    textColors: Object
   },
   setup(props, { emit }) {
     const newColor = ref(null)
@@ -47,17 +50,14 @@ export default {
 <template>
   <div ref="root" class="nng-grid" :style="`grid-template-columns: repeat(${width}, 1fr);`">
     <!-- eslint-disable-next-line vue/require-v-for-key -->
-    <svg
+    <Square
       v-for="(value, index) of pixels"
-      viewBox="0 0 100 100"
-      xmlns="http://www.w3.org/2000/svg"
-      class="nng-square"
-      :style="`background: ${colors[value]}; color: ${textColors[value]};`"
+      :color="colors[value]"
       @pointerdown ="onPointerDown(index, $event)"
       @pointerenter ="onPointerEnter(index)"
     >
-      <foreignObject x="0" y="0" width="100%" height="100%">{{ value === crossColorKey ? 'X': '' }}</foreignObject>
-    </svg>
+      {{ value === crossColorKey ? 'X': '' }}
+    </Square>
   </div>
 </template>
 

@@ -1,9 +1,9 @@
 <script>
-import Clue from "/@/components/Clue.vue"
+import Square from "/@/components/Square.vue"
 
 export default {
   components: {
-    Clue
+    Square
   },
   props: {
     clues: Array,
@@ -19,7 +19,7 @@ export default {
       <!-- eslint-disable-next-line vue/no-unused-vars vue/require-v-for-key -->
       <div v-for="clue in maxLength - clueGroup.length" class="nng-square nng-square-empty"/>
       <!-- eslint-disable-next-line vue/valid-v-for -->
-      <Clue v-for="clue in clueGroup" :clue="clue" :colors="colors"/>
+      <Square v-for="clue in clueGroup" :color="clue.realColor">{{ clue.length }}</Square>
     </template>
   </div>
 </template>

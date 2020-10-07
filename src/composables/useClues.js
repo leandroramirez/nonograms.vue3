@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 
-export default function useClues(nonogram, textColors, backgroundColor) {
+export default function useClues(nonogram, backgroundColor) {
   const getClues = (linesLength, pixelsLength, getPixelFn) => {
     const clues = []
     for (let lineIndex = 0; lineIndex < linesLength; lineIndex++) {
@@ -22,7 +22,6 @@ export default function useClues(nonogram, textColors, backgroundColor) {
         currentClue = {
           color: pixel,
           realColor: nonogram.colors[pixel],
-          textColor: textColors.value[pixel],
           length: 1,
           completed: false
         }
